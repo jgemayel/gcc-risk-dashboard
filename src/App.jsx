@@ -1208,8 +1208,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Footer */}
-          <p style={{ textAlign: "center", marginTop: 14, fontSize: 8, color: C.dim }}>Oliver Wyman | GPI Fiscal Strategy | Iran Conflict Day 4</p>
+
         </div>
       </div>
     );
