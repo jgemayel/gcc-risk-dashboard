@@ -824,26 +824,36 @@ const fetchRSS = async (feed) => {
 };
 
 const fetchGDELT = async () => {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 8000);
-  try {
-    const q = "Iran+Gulf+Hormuz+missile+drone+strike";
-    const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${q}&mode=ArtList&maxrecords=30&format=json&timespan=1440`;
-    // Try direct first (GDELT may support CORS from browsers)
-    let r;
-    try { r = await fetch(url, { signal: ctrl.signal }); } catch {
-      // Fallback to proxy
-      r = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, { signal: ctrl.signal });
-    }
-    const d = await r.json();
-    clearTimeout(timer);
-    return (d.articles || []).map((a) => ({
-      title: a.title || "", link: a.url || "",
-      pubDate: a.seendate ? new Date(a.seendate.replace(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z/, "$1-$2-$3T$4:$5:$6Z")).toISOString() : "",
-      source: (a.domain || "GDELT").replace(/^www\./, ""), icon: "🌐",
-      desc: `via ${(a.domain || "unknown").replace(/^www\./, "")} | lang: ${a.language || "en"}`, isGdelt: true,
-    }));
-  } catch { clearTimeout(timer); return []; }
+  // Use Google News RSS as wire service (GDELT requires backend proxy for CORS)
+  const queries = [
+    { q: "Iran+Gulf+war+missile+drone", label: "Iran Conflict" },
+    { q: "Hormuz+oil+tanker+blockade", label: "Hormuz / Energy" },
+    { q: "Saudi+UAE+Qatar+Kuwait+Bahrain+military+Iran", label: "GCC Military" },
+  ];
+  const all = [];
+  for (const qr of queries) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    try {
+      const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(`https://news.google.com/rss/search?q=${qr.q}&hl=en-US&gl=US&ceid=US:en`)}`;
+      const r = await fetch(url, { signal: ctrl.signal });
+      clearTimeout(timer);
+      const d = await r.json();
+      if (d.status === "ok" && d.items) {
+        all.push(...d.items.map((it) => {
+          const titleParts = (it.title || "").split(" - ");
+          const source = titleParts.length > 1 ? titleParts.pop().trim() : "Google News";
+          const title = titleParts.join(" - ");
+          return { title, link: it.link || "", pubDate: it.pubDate || "", source, icon: "📡",
+            desc: `${qr.label} | via ${source}`, isGdelt: true };
+        }));
+      }
+    } catch { clearTimeout(timer); }
+  }
+  // Deduplicate by title
+  const seen = new Set(); const deduped = [];
+  all.forEach((it) => { const k = it.title.toLowerCase().slice(0, 50); if (!seen.has(k)) { seen.add(k); deduped.push(it); } });
+  return deduped.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
 };
 
 const fetchCommodities = async () => {
@@ -928,7 +938,6 @@ const LiveFeed = ({ mobile, refreshKey }) => {
 
   const sourceFiltered = sourceFilter === "all" ? news : news.filter((n) => n.source === sourceFilter);
   const filtered = filter === "gulf" ? sourceFiltered.filter(isGulfRelated) : sourceFiltered;
-  const gdeltGulf = gdelt.filter(isGulfRelated);
 
   const feedOk = Object.values(feedStatus).filter((s) => s.ok).length;
   const feedTotal = Object.keys(feedStatus).length;
@@ -980,9 +989,29 @@ const LiveFeed = ({ mobile, refreshKey }) => {
   );
 
   return (<>
+    {/* Breaking news ticker bar */}
+    {!loading && news.length > 0 && (
+      <div style={{ marginBottom: 10, padding: "5px 0", background: `${C.red}08`, borderRadius: 5, border: `1px solid ${C.red}15`, overflow: "hidden", position: "relative" }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div style={{ flexShrink: 0, padding: "2px 10px", background: C.red, color: "#fff", fontSize: 8, fontWeight: 800, letterSpacing: 0.8, borderRadius: "3px 0 0 3px", marginRight: 8, textTransform: "uppercase" }}>LIVE</div>
+          <div style={{ overflow: "hidden", flex: 1 }}>
+            <div style={{ display: "flex", gap: 50, animation: `ticker ${Math.max(news.filter(isGulfRelated).length * 4, 40)}s linear infinite`, whiteSpace: "nowrap" }}>
+              {news.filter(isGulfRelated).slice(0, 15).concat(news.filter(isGulfRelated).slice(0, 15)).map((item, i) => (
+                <a key={i} href={item.link} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 5, textDecoration: "none", flexShrink: 0 }}>
+                  <span style={{ color: C.red, fontSize: 6 }}>●</span>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: C.text }}>{item.title}</span>
+                  <span style={{ fontSize: 8, color: C.dim, fontStyle: "italic" }}>{item.source}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10, flexWrap: "wrap", gap: 6 }}>
       <div style={{ display: "flex", gap: 4 }}>
-        {[{ k: "news", l: "Live News" }, { k: "gdelt", l: "GDELT Events" }, { k: "markets", l: "Markets & FX" }].map((t) => (
+        {[{ k: "news", l: "Live News" }, { k: "gdelt", l: "News Wire" }, { k: "markets", l: "Markets & FX" }].map((t) => (
           <button key={t.k} onClick={() => setSubTab(t.k)} style={{ padding: "4px 10px", borderRadius: 4, border: `1px solid ${subTab === t.k ? C.red : C.border}`, background: subTab === t.k ? `${C.red}12` : C.card, color: subTab === t.k ? C.red : C.muted, fontSize: 10, fontWeight: 600, cursor: "pointer" }}>{t.l}</button>
         ))}
       </div>
@@ -1104,25 +1133,31 @@ const LiveFeed = ({ mobile, refreshKey }) => {
     )}
 
     {subTab === "gdelt" && (
-      <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 12 }}>
-        <Card>
-          <Ttl warning sub={`${gdeltGulf.length} Gulf-related events from GDELT (last 24h)`}>GDELT Conflict Events</Ttl>
-          <p style={{ margin: "0 0 8px", fontSize: 9, color: C.dim, lineHeight: 1.4 }}>
-            GDELT (Global Database of Events, Language and Tone) indexes news from 100+ languages in near-real-time. These are automatically detected conflict-related events filtered for the Gulf region.
-          </p>
-          {loading && <div style={{ textAlign: "center", padding: 30, color: C.muted }}><div style={{ fontSize: 20, animation: "pulse 1.5s infinite" }}>⟳</div></div>}
-          <div style={{ maxHeight: mobile ? 400 : 550, overflowY: "auto" }}>
-            {gdeltGulf.slice(0, 40).map((item, i) => <NewsItem key={`gdelt-${i}`} item={item} />)}
-            {!loading && gdeltGulf.length === 0 && <p style={{ fontSize: 10, color: C.dim, textAlign: "center", padding: 20 }}>No Gulf-related GDELT events found. This may be due to API rate limits.</p>}
+      <Card>
+        <Ttl warning sub={`${gdelt.length} articles from Google News wire (live)`}>News Wire Feed</Ttl>
+        <p style={{ margin: "0 0 8px", fontSize: 9, color: C.dim, lineHeight: 1.4 }}>
+          Real-time aggregated headlines from Google News, filtered for Iran conflict, Hormuz/energy, and GCC military developments. Sources include NYT, BBC, Reuters, CNN, Al Jazeera, Forbes, and 100+ outlets.
+        </p>
+        {/* Scrolling ticker */}
+        {gdelt.length > 0 && (
+          <div style={{ overflow: "hidden", marginBottom: 10, padding: "6px 0", borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, position: "relative" }}>
+            <div style={{ display: "flex", gap: 40, animation: `ticker ${Math.max(gdelt.length * 3, 30)}s linear infinite`, whiteSpace: "nowrap" }}>
+              {gdelt.slice(0, 20).concat(gdelt.slice(0, 20)).map((item, i) => (
+                <a key={i} href={item.link} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6, textDecoration: "none", flexShrink: 0 }}>
+                  {isGulfRelated(item) && <span style={{ color: C.red, fontSize: 8 }}>●</span>}
+                  <span style={{ fontSize: 10, fontWeight: 600, color: C.text }}>{item.title}</span>
+                  <span style={{ fontSize: 8, color: C.dim }}>{item.source} · {timeAgo(item.pubDate)}</span>
+                </a>
+              ))}
+            </div>
           </div>
-        </Card>
-        <Card>
-          <Ttl sub={`${gdelt.length} total events fetched`}>All GDELT Results</Ttl>
-          <div style={{ maxHeight: mobile ? 400 : 550, overflowY: "auto" }}>
-            {gdelt.slice(0, 40).map((item, i) => <NewsItem key={`gdelt-all-${i}`} item={item} />)}
-          </div>
-        </Card>
-      </div>
+        )}
+        {loading && <div style={{ textAlign: "center", padding: 30, color: C.muted }}><div style={{ fontSize: 20, animation: "pulse 1.5s infinite" }}>⟳</div></div>}
+        <div style={{ display: "grid", gridTemplateColumns: mobile ? "1fr" : "1fr 1fr", gap: 8, maxHeight: mobile ? 500 : 600, overflowY: "auto" }}>
+          {gdelt.slice(0, 30).map((item, i) => <NewsItem key={`wire-${i}`} item={item} />)}
+          {!loading && gdelt.length === 0 && <p style={{ fontSize: 10, color: C.dim, textAlign: "center", padding: 20, gridColumn: "1 / -1" }}>Wire feed loading... This may take a moment on first load.</p>}
+        </div>
+      </Card>
     )}
   </>);
 };
@@ -1224,7 +1259,7 @@ export default function App() {
   return (
     <div style={{ minHeight: "100vh", background: C.bg, color: C.text, fontFamily: "'DM Sans','Segoe UI',system-ui,sans-serif", padding: mobile ? "10px" : "18px 24px", maxWidth: 1400, margin: "0 auto" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
-      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}*{box-sizing:border-box}::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:${C.bg}}::-webkit-scrollbar-thumb{background:${C.border};border-radius:2px}`}</style>
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}*{box-sizing:border-box}::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:${C.bg}}::-webkit-scrollbar-thumb{background:${C.border};border-radius:2px}`}</style>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: mobile ? "flex-start" : "center", marginBottom: 10, flexDirection: mobile ? "column" : "row", gap: 6 }}>
         <div>
