@@ -86,6 +86,16 @@ const infraDB = {
       { name: "Shaybah NGL Facility", type: "Processing", capacity: "1 Mbpd NGL", status: "OPERATIONAL", note: "Deep Rub al Khali. Remote. Previously droned 2019 (minor)." },
       { name: "Hawiyah NGL Plant", type: "Processing", capacity: "4.4 Bcf/day gas processing", status: "AT RISK", note: "Central Province. Feeds Master Gas System." },
     ],
+    telecom: [
+      { name: "STC (Saudi Telecom)", type: "Fixed + Mobile", capacity: "Largest ME telco, 5G leader", status: "STRAINED", note: "Cell towers near Eastern Province strike zones on backup power. Network congestion from emergency traffic. Data center in Riyadh operational." },
+      { name: "Mobily (Etihad Etisalat)", type: "Mobile + Data", capacity: "2nd largest Saudi operator", status: "STRAINED", note: "Reduced throughput in Eastern Province. Riyadh and Jeddah networks holding." },
+      { name: "Zain KSA", type: "Mobile", capacity: "3rd operator", status: "OPERATIONAL", note: "Western region coverage stable. Eastern network degraded near strike zones." },
+      { name: "Jeddah Cable Landing Station", type: "Submarine Cable Hub", capacity: "AAE-1, IMEWE, EIG, SMW5", status: "OPERATIONAL", note: "Red Sea side. Multiple cable systems land here. Outside direct threat zone. Critical redundancy." },
+      { name: "Eastern Province Cable Landing", type: "Submarine Cable", capacity: "FLAG, Gulf Bridge Intl", status: "AT RISK", note: "Gulf-side cable landings. Hormuz transit cables at risk from naval mines, anchored ships, or sabotage." },
+      { name: "MEEZA Cloud Region (Riyadh)", type: "Data Center", capacity: "Tier III+", status: "OPERATIONAL", note: "Interior location. Government cloud workloads. Power supply stable from western grid." },
+      { name: "STC Cloud Data Centers", type: "Data Center", capacity: "Multiple facilities", status: "OPERATIONAL", note: "Riyadh and Jeddah campuses. STC operates Saudi government cloud. Backup generators active." },
+      { name: "Tadawul (Stock Exchange)", type: "Financial Systems", capacity: "Largest ME exchange by market cap", status: "VOLATILE", note: "Trading suspended intermittently. SWIFT connectivity intact via Red Sea cables. Settlement systems operational but under stress." },
+    ],
   },
   UAE: {
     ports: [
@@ -153,6 +163,15 @@ const infraDB = {
       { name: "Umm Shaif/Nasr Offshore", type: "Offshore Oil/Gas", capacity: "Key offshore fields", status: "AT RISK", note: "Gulf-facing offshore platforms. Within potential strike range." },
       { name: "ADNOC Strategic Oil Storage (Fujairah)", type: "Strategic Reserve", capacity: "42M bbl (shared FOIC)", status: "OPERATIONAL", note: "Underground caverns at Al Ruwais. Emergency reserve." },
     ],
+    telecom: [
+      { name: "e& (Etisalat)", type: "Fixed + Mobile + DC", capacity: "Largest UAE telco", status: "DEGRADED", note: "Increased latency in Dubai and Abu Dhabi. Cell towers near Jebel Ali and Musaffah on backup power. Fujairah cable landing operational but at risk." },
+      { name: "du (EITC)", type: "Fixed + Mobile", capacity: "2nd UAE operator", status: "DEGRADED", note: "Network congestion from emergency traffic. Some Dubai cell sites offline near strike zones. Sharjah industrial coverage degraded." },
+      { name: "Fujairah Cable Landing Station", type: "Submarine Cable Hub", capacity: "FLAG, EIG, AAE-1, IMEWE, 2Africa", status: "AT RISK", note: "Major global cable junction outside Hormuz but near conflict zone. Damage would sever Gulf-to-Asia connectivity for multiple nations." },
+      { name: "Jebel Ali Data Center Campus", type: "Data Center Cluster", capacity: "Equinix, Khazna, Gulf Data Hub", status: "AT RISK", note: "Co-located near Jebel Ali port (halted). Power instability from debris fires. Multiple hyperscaler PoPs." },
+      { name: "Khazna DC (Abu Dhabi / Masdar)", type: "Data Center", capacity: "Largest ME carrier-neutral DC", status: "STRAINED", note: "Running on backup generators. Oracle and Microsoft Azure ME region depends on this infrastructure." },
+      { name: "Dubai Internet City / DIFC Hub", type: "Tech Infrastructure", capacity: "Fintech + cloud hub", status: "STRAINED", note: "Remote work mandated. Financial systems (DFSA, DIFX) on backup connectivity. Physical offices closed." },
+      { name: "DFM / ADX Exchanges", type: "Financial Systems", capacity: "UAE equity + bond markets", status: "VOLATILE", note: "Trading suspended multiple times. SWIFT via Fujairah cables. Settlement delays reported." },
+    ],
   },
   Qatar: {
     ports: [
@@ -198,6 +217,14 @@ const infraDB = {
       { name: "Mesaieed NGL Complex", type: "Gas Processing", capacity: "NGL extraction", status: "OPERATIONAL", note: "Ethane, propane, butane extraction. Feeds QAPCO." },
       { name: "Dolphin Pipeline (to UAE/Oman)", type: "Subsea Gas Pipeline", capacity: "3.2 Bcf/day export", status: "AT RISK", note: "Subsea Gulf crossing. If severed, UAE loses ~30% gas, Oman loses minor import." },
       { name: "Barzan Gas Project", type: "Gas Processing", capacity: "1.4 Bcf/day", status: "OPERATIONAL", note: "Domestic gas supply project. Feeds power sector." },
+    ],
+    telecom: [
+      { name: "Ooredoo Qatar", type: "Fixed + Mobile + DC", capacity: "Incumbent national operator", status: "STRAINED", note: "Power disruptions from Ras Laffan/Mesaieed strikes cascading to cell network. Emergency traffic overloading. Doha core stable." },
+      { name: "Vodafone Qatar", type: "Mobile + Fixed", capacity: "2nd operator", status: "STRAINED", note: "Cell towers in southern industrial zones on backup power. Network prioritizing emergency services." },
+      { name: "FLAG Europe-Asia Cable Landing", type: "Submarine Cable", capacity: "FLAG/FALCON system", status: "AT RISK", note: "Single cable path through Gulf. Qatar has limited cable diversity. If Hormuz cables severed, internet capacity drops severely." },
+      { name: "Ooredoo Data Center (Doha)", type: "Data Center", capacity: "Tier III, government cloud", status: "STRAINED", note: "Backup generators active. Hosts Qatar government services and financial platforms. Power stability concern." },
+      { name: "Meeza M-Vault Data Centers", type: "Data Center", capacity: "Tier III+, 2 facilities", status: "OPERATIONAL", note: "Qatar Foundation backed. Hosts QSE trading systems. Interior Doha location provides some buffer." },
+      { name: "QSE (Qatar Stock Exchange)", type: "Financial Systems", capacity: "Qatar equity market", status: "VOLATILE", note: "Trading halted intermittently. Connectivity depends on Gulf submarine cables. SWIFT operational but stressed." },
     ],
   },
   Kuwait: {
@@ -246,6 +273,13 @@ const infraDB = {
       { name: "Northern Oil Fields (Ratqa/Sabriyah)", type: "Oil Field", capacity: "0.6 Mbpd combined", status: "AT RISK", note: "Near Iraqi border. Heavy oil. KOC operated." },
       { name: "Kuwait Gas Import Pipeline", type: "Gas Pipeline", capacity: "Limited import volume", status: "AT RISK", note: "Kuwait is net gas importer. Any cut collapses power grid within days." },
       { name: "KPC Strategic Oil Storage", type: "Strategic Reserve", capacity: "~10M bbl", status: "OPERATIONAL", note: "Domestic buffer for refinery feed. Limited duration." },
+    ],
+    telecom: [
+      { name: "Zain Kuwait", type: "Fixed + Mobile", capacity: "Largest Kuwaiti operator", status: "DEGRADED", note: "Cell towers near Ali Al Salem and airport strike zones damaged or on backup power. Network overwhelmed by emergency calls and sirens." },
+      { name: "STC Kuwait (Ooredoo rebranded)", type: "Mobile + Fixed", capacity: "2nd operator", status: "DEGRADED", note: "Southern coverage near Ahmadi refinery area degraded. Residential areas Rumaithiya/Salwa experiencing outages." },
+      { name: "Gulf Bridge International Cable", type: "Submarine Cable", capacity: "GBI system, Gulf transit", status: "AT RISK", note: "Primary international connectivity. Transits Gulf waters. Highly vulnerable to mine damage, anchor strikes from 150+ stranded tankers." },
+      { name: "Kuwait Data Center (Zain)", type: "Data Center", capacity: "Tier III", status: "STRAINED", note: "Running on backup generators. Grid already failing in peacetime (2024-25 blackouts). Extended outage risk highest in GCC." },
+      { name: "Boursa Kuwait", type: "Financial Systems", capacity: "Kuwait stock exchange", status: "VOLATILE", note: "Trading suspended. SWIFT connectivity dependent on submarine cables. Central Bank payment systems on emergency protocols." },
     ],
   },
   Oman: {
@@ -310,6 +344,14 @@ const infraDB = {
       { name: "Rabab Harweel Gas (PDO)", type: "Gas Field", capacity: "0.5 Bcf/day", status: "PRODUCING", note: "Southern interior. PDO. Feeds Salalah + export." },
       { name: "Fahud Oil Field (PDO)", type: "Oil Field", capacity: "Major production", status: "PRODUCING", note: "Interior. PDO operated. Oman's most prolific." },
     ],
+    telecom: [
+      { name: "Omantel", type: "Fixed + Mobile + DC", capacity: "Incumbent national operator", status: "OPERATIONAL", note: "Network largely intact. Muscat core stable. Some degradation near northern coast (Khasab area) due to maritime conflict proximity." },
+      { name: "Ooredoo Oman", type: "Mobile + Fixed", capacity: "2nd operator", status: "OPERATIONAL", note: "Coverage stable in Muscat and interior. Salalah fully operational. Duqm area experiencing intermittent issues." },
+      { name: "AAE-1 / EIG / IMEWE Cable Landings", type: "Submarine Cable Hub", capacity: "Multiple systems via Muscat/Barka", status: "AT RISK", note: "Oman is a key cable landing point between Gulf and Indian Ocean. Less exposed than Fujairah but still within conflict zone. Cable ship access restricted." },
+      { name: "Oman Data Park", type: "Data Center", capacity: "Tier III, national DC provider", status: "OPERATIONAL", note: "Muscat and Salalah facilities. Government and enterprise workloads. Power supply stable from domestic gas." },
+      { name: "Salalah Free Zone Tech Hub", type: "Data Center / Tech", capacity: "Growing DC capacity", status: "OPERATIONAL", note: "Arabian Sea coast. Furthest from conflict of any GCC data facility. Potential fallback for regional workloads." },
+      { name: "Muscat Securities Market", type: "Financial Systems", capacity: "Oman equity market", status: "REDUCED", note: "Trading hours shortened. Connectivity stable via Indian Ocean cables. Lower volumes." },
+    ],
   },
   Bahrain: {
     ports: [
@@ -350,6 +392,14 @@ const infraDB = {
       { name: "ALBA Aluminum Smelter", type: "Industrial", capacity: "1.56 Mtpa aluminum", status: "AT RISK", note: "One of world's largest smelters. 12% of GDP. Massive power consumer. Any power cut = pot line freeze." },
       { name: "King Fahd Causeway", type: "Road/Bridge Link", capacity: "To Saudi Arabia, 25km", status: "OPERATIONAL", note: "Only land exit from island. Evacuation route. Supply corridor. Potential bottleneck." },
       { name: "Saudi-Bahrain Gas Pipeline (proposed)", type: "Pipeline", capacity: "Not yet built", status: "NOT AVAILABLE", note: "Long-discussed gas interconnect to Saudi. Never completed. Would have been critical now." },
+    ],
+    telecom: [
+      { name: "Batelco", type: "Fixed + Mobile + DC", capacity: "Incumbent national operator", status: "DEGRADED", note: "Cell towers near Juffair (5th Fleet area) damaged or on backup. Network congestion extreme on small island. Cable landing station at risk." },
+      { name: "STC Bahrain (Zain rebrand)", type: "Mobile + Fixed", capacity: "2nd operator", status: "DEGRADED", note: "Hoora and Seef towers in strike zones offline. Emergency service priority routing active." },
+      { name: "AWS Middle East (Bahrain)", type: "Hyperscale Cloud Region", capacity: "3 Availability Zones", status: "AT RISK", note: "Only AWS region in ME. Serves entire Gulf + MENA workloads. 5th Fleet evacuation zone nearby. Power + cable connectivity both vulnerable. Outage would cascade across regional cloud customers." },
+      { name: "Batelco Data Center (Hamala)", type: "Data Center", capacity: "Tier III, carrier-neutral", status: "STRAINED", note: "Hosts Bahrain financial sector workloads. Running on backup generators. Gas supply barely meeting power demand." },
+      { name: "GBI / FLAG Cable Landing", type: "Submarine Cable", capacity: "Gulf Bridge Intl + FLAG", status: "AT RISK", note: "Island nation fully dependent on submarine cables. No overland fiber fallback except via King Fahd Causeway microwave. If cables cut, total internet isolation." },
+      { name: "Bahrain Bourse (BHB)", type: "Financial Systems", capacity: "Bahrain equity market + fintech hub", status: "VOLATILE", note: "Trading suspended. Bahrain FinTech Bay operations disrupted. Central Bank payment systems on emergency mode." },
     ],
   },
 };
@@ -582,7 +632,7 @@ const MiniBar = ({ value, max = 100, color, label }) => (<div style={{ marginBot
 
 const statusColor = (s) => {
   if (["HALTED", "CLOSED", "STRANDED", "DAMAGED", "STRUCK"].includes(s)) return C.red;
-  if (["AT RISK", "STRAINED", "REDUCED", "RESTRICTED", "DEPLETING"].includes(s)) return C.orange;
+  if (["AT RISK", "STRAINED", "REDUCED", "RESTRICTED", "DEPLETING", "DEGRADED", "VOLATILE"].includes(s)) return C.orange;
   if (["CRITICAL ASSET", "PRODUCING"].includes(s)) return C.amber;
   return C.green;
 };
@@ -672,14 +722,14 @@ const InfraSection = ({ title, items, icon }) => (
 const InfraDeepDive = ({ country, mobile }) => {
   const infra = infraDB[country.name];
   if (!infra) return null;
-  const allItems = [...(infra.ports||[]), ...(infra.airports||[]), ...(infra.power||[]), ...(infra.desal||[]), ...(infra.energy||[])];
+  const allItems = [...(infra.ports||[]), ...(infra.airports||[]), ...(infra.power||[]), ...(infra.desal||[]), ...(infra.energy||[]), ...(infra.telecom||[])];
   const critical = allItems.filter(i => ["HALTED","CLOSED","STRANDED","DAMAGED","STRUCK"].includes(i.status)).length;
-  const atRisk = allItems.filter(i => ["AT RISK","STRAINED","REDUCED","RESTRICTED","DEPLETING"].includes(i.status)).length;
-  const operational = allItems.filter(i => !["HALTED","CLOSED","STRANDED","DAMAGED","STRUCK","AT RISK","STRAINED","REDUCED","RESTRICTED","DEPLETING"].includes(i.status)).length;
+  const atRisk = allItems.filter(i => ["AT RISK","STRAINED","REDUCED","RESTRICTED","DEPLETING","DEGRADED","VOLATILE"].includes(i.status)).length;
+  const operational = allItems.filter(i => !["HALTED","CLOSED","STRANDED","DAMAGED","STRUCK","AT RISK","STRAINED","REDUCED","RESTRICTED","DEPLETING","DEGRADED","VOLATILE"].includes(i.status)).length;
 
   return (
     <Card glow={critical > 0}>
-      <Ttl warning={critical > 0} sub={`${allItems.length} facilities tracked across 5 categories`}>
+      <Ttl warning={critical > 0} sub={`${allItems.length} facilities tracked across 6 categories`}>
         Critical Infrastructure Status
       </Ttl>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginBottom: 14 }}>
@@ -707,6 +757,9 @@ const InfraDeepDive = ({ country, mobile }) => {
           {infra.energy && <InfraSection title="Pipelines, Refineries & Energy" items={infra.energy} icon="🛢️" />}
         </div>
       </div>
+      {infra.telecom && (<div style={{ marginTop: 14 }}>
+        <InfraSection title="Telecom, Data Centers & Connectivity" items={infra.telecom} icon="📡" />
+      </div>)}
     </Card>
   );
 };
